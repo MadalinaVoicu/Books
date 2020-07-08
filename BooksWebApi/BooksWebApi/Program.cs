@@ -24,7 +24,7 @@ namespace BooksWebApi
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     //SS: UseStartup specifies the startup type to be used by the web host.
-                    webBuilder.UseStartup<Startup>(); 
+                    webBuilder.UseStartup<Startup>();
                 });
     }
 }

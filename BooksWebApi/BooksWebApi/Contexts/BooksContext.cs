@@ -7,7 +7,7 @@ namespace BooksWebApi.Contexts
     {
         public BooksContext(DbContextOptions<BooksContext> options)
           : base(options)
-        { 
+        {
         }
 
         public DbSet<User> Users { get; set; }
