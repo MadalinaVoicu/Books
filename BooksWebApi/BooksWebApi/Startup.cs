@@ -1,4 +1,6 @@
 using BooksWebApi.Contexts;
+using BooksWebApi.Services.Repositories;
+using BooksWebApi.Services.UnitsOfWork;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -31,6 +33,13 @@ namespace BooksWebApi
             var connectionString = Configuration["ConnectionStrings:BooksDBConnectionString"];
             services.AddDbContext<BooksContext>(o => o.UseSqlServer(connectionString));
 
+            // SS: Adding services on the container
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IBookRepository, BookRepository>();
+            services.AddScoped<IAuthorRepository, AuthorRepository>();
+
+            services.AddScoped<IUserUnitOfWork, UserUnitOfWork>();
+            services.AddScoped<IBookUnitOfWork, BookUnitOfWork>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
