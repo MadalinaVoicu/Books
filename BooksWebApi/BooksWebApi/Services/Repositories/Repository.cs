@@ -52,7 +52,7 @@ namespace BooksWebApi.Services.Repositories
             return _context.Set<TEntity>().ToList();
         }
 
-        public TEntity Get(int id)
+        public TEntity Get(Guid id)
         {
             return _context.Set<TEntity>().Find(id);
         }

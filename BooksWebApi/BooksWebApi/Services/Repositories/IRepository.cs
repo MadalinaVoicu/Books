@@ -16,7 +16,7 @@ namespace BooksWebApi.Services.Repositories
 
         IEnumerable<TEntity> GetAll();
 
-        TEntity Get(int id);
+        TEntity Get(Guid id);
 
         TEntity Remove(TEntity entity);
 

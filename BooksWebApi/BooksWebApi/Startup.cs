@@ -1,3 +1,4 @@
+using AutoMapper;
 using BooksWebApi.Contexts;
 using BooksWebApi.Services.Repositories;
 using BooksWebApi.Services.UnitsOfWork;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace BooksWebApi
 {
@@ -40,6 +42,9 @@ namespace BooksWebApi
 
             services.AddScoped<IUserUnitOfWork, UserUnitOfWork>();
             services.AddScoped<IBookUnitOfWork, BookUnitOfWork>();
+
+            services.AddControllers();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,10 +62,7 @@ namespace BooksWebApi
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
+                endpoints.MapControllers();
             });
         }
     }

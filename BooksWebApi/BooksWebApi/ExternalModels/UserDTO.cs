@@ -1,8 +1,10 @@
-﻿namespace BooksWebApi.ExternalModels
+﻿using System;
+
+namespace BooksWebApi.ExternalModels
 {
     public class UserDTO
     {
-        public int ID { get; set; }
+        public Guid ID { get; set; }
 
         public string FirstName { get; set; }
 
