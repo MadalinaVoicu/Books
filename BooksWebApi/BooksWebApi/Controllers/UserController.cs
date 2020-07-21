@@ -3,8 +3,12 @@ using BooksWebApi.Entities;
 using BooksWebApi.ExternalModels;
 using BooksWebApi.Services.UnitsOfWork;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace BooksWebApi.Controllers
 {
@@ -62,6 +66,39 @@ namespace BooksWebApi.Controllers
             return CreatedAtRoute("GetUser",
                 new { id = userEntity.ID },
                 _mapper.Map<UserDTO>(userEntity));
+        }
+
+        [Route("login")]
+        [HttpPost]
+        public IActionResult Login([FromBody] LoginDTO user)
+        {
+            if (user == null)
+            {
+                return BadRequest("Invalid client request.");
+            }
+
+            var foundUser = _userUnit.Users.FindDefault(u => u.Email.Equals(user.Email) && u.Password.Equals(user.Password) && (u.Deleted == false || u.Deleted == null));
+
+            if (foundUser != null)
+            {
+                var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MySecretKey@2020"));
+                var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+
+                var tokeOptions = new JwtSecurityToken(
+                    issuer: "https://localhost:44318",
+                    audience: "https://localhost:44318",
+                    claims: new List<Claim>(),
+                    expires: DateTime.Now.AddHours(8),
+                    signingCredentials: signinCredentials
+                );
+
+                var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
+                return Ok(new { Token = tokenString });
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
     }
 }
