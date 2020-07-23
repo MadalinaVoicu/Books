@@ -2,6 +2,7 @@
 using BooksWebApi.Entities;
 using BooksWebApi.ExternalModels;
 using BooksWebApi.Services.UnitsOfWork;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -14,6 +15,7 @@ namespace BooksWebApi.Controllers
 {
     [Route("user")]
     [ApiController]
+    [EnableCors]
     public class UserController : ControllerBase
     {
         private readonly IUserUnitOfWork _userUnit;

@@ -3,6 +3,7 @@ using BooksWebApi.Entities;
 using BooksWebApi.ExternalModels;
 using BooksWebApi.Services.UnitsOfWork;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace BooksWebApi.Controllers
 {
     [Route("book")]
     [ApiController]
+    [EnableCors]
     public class BookController : ControllerBase
     {
         private readonly IBookUnitOfWork _bookUnit;

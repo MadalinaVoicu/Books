@@ -31,6 +31,15 @@ namespace BooksWebApi
         {
             //SS: ConfigureServices is used to add services on the container and to configure those services.
             //SS: All the services we add here can later be injected into other pieces of code that live in our application.
+            services.AddCors(options =>
+            {
+                options.AddPolicy("EnableCORS", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                       .AllowAnyHeader()
+                       .AllowAnyMethod();
+                });
+            });
 
             services.AddAuthentication(opt =>
             {
@@ -82,6 +91,7 @@ namespace BooksWebApi
 
             app.UseRouting();
 
+            app.UseCors("EnableCORS");
             app.UseAuthentication();
             app.UseAuthorization();
 
