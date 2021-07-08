@@ -2,6 +2,8 @@
 using BooksWebApi.Entities;
 using BooksWebApi.ExternalModels;
 using BooksWebApi.Services.UnitsOfWork;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -10,6 +12,7 @@ namespace BooksWebApi.Controllers
 {
     [Route("book")]
     [ApiController]
+    [EnableCors]
     public class BookController : ControllerBase
     {
         private readonly IBookUnitOfWork _bookUnit;
@@ -21,8 +24,9 @@ namespace BooksWebApi.Controllers
             _bookUnit = bookUnit ?? throw new ArgumentNullException(nameof(bookUnit));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
+
         #region Books
-        [HttpGet]
+        [HttpGet, Authorize]
         [Route("{id}", Name = "GetBook")]
         public IActionResult GetBook(Guid id)
         {
@@ -35,7 +39,20 @@ namespace BooksWebApi.Controllers
             return Ok(_mapper.Map<BookDTO>(bookEntity));
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
+        [Route("", Name = "GetAllBooks")]
+        public IActionResult GetAllBooks()
+        {
+            var bookEntities = _bookUnit.Books.Find(a => a.Deleted == false || a.Deleted == null);
+            if (bookEntities == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<List<BookDTO>>(bookEntities));
+        }
+
+        [HttpGet, Authorize]
         [Route("details/{id}", Name = "GetBookDetails")]
         public IActionResult GetBookDetails(Guid id)
         {
@@ -49,7 +66,7 @@ namespace BooksWebApi.Controllers
         }
 
         [Route("add", Name = "Add a new book")]
-        [HttpPost]
+        [HttpPost, Authorize]
         public IActionResult AddBook([FromBody] BookDTO book)
         {
             var bookEntity = _mapper.Map<Book>(book);
@@ -66,7 +83,7 @@ namespace BooksWebApi.Controllers
         #endregion Books
 
         #region Authors
-        [HttpGet]
+        [HttpGet, Authorize]
         [Route("author/{authorId}", Name = "GetAuthor")]
         public IActionResult GetAuthor(Guid authorId)
         {
@@ -79,7 +96,7 @@ namespace BooksWebApi.Controllers
             return Ok(_mapper.Map<AuthorDTO>(authorEntity));
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         [Route("author", Name = "GetAllAuthors")]
         public IActionResult GetAllAuthors()
         {
@@ -93,7 +110,7 @@ namespace BooksWebApi.Controllers
         }
 
         [Route("author/add", Name = "Add a new author")]
-        [HttpPost]
+        [HttpPost, Authorize]
         public IActionResult AddAuthor([FromBody] AuthorDTO author)
         {
             var authorEntity = _mapper.Map<Author>(author);
@@ -109,7 +126,7 @@ namespace BooksWebApi.Controllers
         }
 
         [Route("author/{authorId}", Name = "Mark author as deleted")]
-        [HttpPut]
+        [HttpPut, Authorize]
         public IActionResult MarkAuthorAsDeleted(Guid authorId)
         {
             var author = _bookUnit.Authors.FindDefault(a => a.Id.Equals(authorId) && (a.Deleted == false || a.Deleted == null));

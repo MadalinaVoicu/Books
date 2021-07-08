@@ -2,13 +2,16 @@ using AutoMapper;
 using BooksWebApi.Contexts;
 using BooksWebApi.Services.Repositories;
 using BooksWebApi.Services.UnitsOfWork;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Text;
 
 namespace BooksWebApi
 {
@@ -28,6 +31,35 @@ namespace BooksWebApi
         {
             //SS: ConfigureServices is used to add services on the container and to configure those services.
             //SS: All the services we add here can later be injected into other pieces of code that live in our application.
+            services.AddCors(options =>
+            {
+                options.AddPolicy("EnableCORS", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                       .AllowAnyHeader()
+                       .AllowAnyMethod();
+                });
+            });
+
+            services.AddAuthentication(opt =>
+            {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidIssuer = "https://localhost:44318",
+                    ValidAudience = "https://localhost:44318",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MySecretKey@2020"))
+                };
+            });
 
             // Register the DbContext on the container, getting the connection string from appSettings.
             // (Note: Use this during development; In a production environment, it's better to store the connection string in an environment variable)
@@ -58,6 +90,10 @@ namespace BooksWebApi
             }
 
             app.UseRouting();
+
+            app.UseCors("EnableCORS");
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
